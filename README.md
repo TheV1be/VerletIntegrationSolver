@@ -1,5 +1,6 @@
 # VerletIntegrationSolver
 2D Verlet integration physics solver in C++ with SFML
+
 Inspired by Pezzza's Work on YouTube
 
 ## Build & run
