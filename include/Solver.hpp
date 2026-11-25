@@ -33,7 +33,7 @@ private:
   sf::Vector2f m_bounds;
   sf::Vector2f m_gravity{0.f, 1000.f};
   uint32_t m_sub_steps;
-  float m_restitution = 0.85f;
+  float m_restitution = 0.8f;
 
   bool m_field_active = false;
   sf::Vector2f m_field_pos{0.f, 0.f};
