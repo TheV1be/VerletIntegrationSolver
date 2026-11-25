@@ -11,4 +11,14 @@ Requires: g++, cmake, make, SFML 2.6 (dev package)
     make
 
 ## Controls
-Left click: spawn, Right click: attract, Space: stream, M/N: add/remove streams, R: reset
+- R: reset
+- Space: stream
+- M/N: add/remove streams
+- Left click: spawn
+- Right click: attract/repulse
+- I: change attraction/repulsion of Right click
+- WASD: change gravity
+- C: toggle color by speed
+- 1: spawn rope at mouse
+- 2: spawn bridge at mouse
+- 3: spawn cloth at mouse
