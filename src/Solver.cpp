@@ -1,4 +1,5 @@
 #include "Solver.hpp"
+#include <SFML/System/Vector2.hpp>
 #include <algorithm>
 #include <cmath>
 
@@ -80,7 +81,7 @@ void Solver::update(float dt) {
       solveConstraints();
     }
     solveCollisions();
-    applyWindowBounds();
+    applyCircularWindowBounds();
   }
 }
 
@@ -141,6 +142,31 @@ void Solver::applyWindowBounds() {
   }
 }
 
+void Solver::applyCircularWindowBounds() {
+  const sf::Vector2f center = m_bounds * 0.5f;
+  const float container_r = m_bounds.y * 0.5f * (4.f / 5.f);
+
+  for (auto &p : m_particles) {
+    if (p.pinned)
+      continue;
+
+    const sf::Vector2f axis = p.current_pos - center;
+    const float len = std::sqrt(axis.x * axis.x + axis.y * axis.y);
+    const float limit = container_r - p.radius;
+
+    if (len > limit && len > 0.0001f) {
+      const sf::Vector2f n = axis / len;                // points outward
+      const sf::Vector2f v = p.current_pos - p.old_pos; // velocity per substep
+      const float vn = v.x * n.x + v.y * n.y;           // >0 = moving into wall
+      const sf::Vector2f v_tangent = v - n * vn;
+
+      p.current_pos = center + n * limit; // snap back inside
+
+      const float new_vn = (vn > 0.f) ? -vn * m_restitution : vn;
+      p.old_pos = p.current_pos - (v_tangent + n * new_vn);
+    }
+  }
+}
 void Solver::resolvePair(uint32_t idx1, uint32_t idx2) {
   Particle &p1 = m_particles[idx1];
   Particle &p2 = m_particles[idx2];

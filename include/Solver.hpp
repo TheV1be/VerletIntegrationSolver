@@ -40,6 +40,7 @@ private:
   void applyForceField();
   void updatePositions(float dt);
   void applyWindowBounds();
+  void applyCircularWindowBounds();
   void solveCollisions();
   void resolvePair(uint32_t idx1, uint32_t idx2);
   void solveConstraints();
