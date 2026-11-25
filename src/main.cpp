@@ -19,7 +19,7 @@ int main() {
   // window.setFramerateLimit(144);
 
   constexpr float GRAVITY = 1000.f;
-  constexpr float BALL_RADIUS = 8.f;
+  constexpr float BALL_RADIUS = 7.f;
   float color_phase = 0.f;
 
   constexpr uint32_t SUB_STEPS = 8;
