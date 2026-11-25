@@ -167,6 +167,7 @@ void Solver::applyCircularWindowBounds() {
     }
   }
 }
+
 void Solver::resolvePair(uint32_t idx1, uint32_t idx2) {
   Particle &p1 = m_particles[idx1];
   Particle &p2 = m_particles[idx2];
