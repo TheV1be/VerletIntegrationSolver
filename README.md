@@ -6,8 +6,8 @@ Inspired by Pezzza's Work on YouTube
 ## Build & run
 Requires: g++, cmake, make, SFML 2.6 (dev package)
 
-    git clone <repo url>
-    cd <folder>
+    git clone https://github.com/TheV1be/VerletIntegrationSolver.git
+    cd VerletIntegrationSolver
     make
 
 ## Controls
