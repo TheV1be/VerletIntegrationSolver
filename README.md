@@ -19,6 +19,7 @@ Requires: g++, cmake, make, SFML 2.6 (dev package)
 - I: change attraction/repulsion of Right click
 - WASD: change gravity
 - C: toggle color by speed
+- B: toggle circular bounds
 - 1: spawn rope at mouse
 - 2: spawn bridge at mouse
 - 3: spawn cloth at mouse
