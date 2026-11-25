@@ -7,7 +7,8 @@ class Renderer {
 public:
   Renderer();
 
-  void render(sf::RenderWindow &window, const std::vector<Particle> &particles);
+  void render(sf::RenderWindow &window, const std::vector<Particle> &particles,
+              bool color_by_speed = false, float sub_dt = 1.f / 480.f);
 
 private:
   sf::RenderTexture m_circle_rt;

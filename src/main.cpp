@@ -18,6 +18,7 @@ int main() {
   window.setVerticalSyncEnabled(true);
   // window.setFramerateLimit(144);
 
+  constexpr float GRAVITY = 1000.f;
   constexpr float BALL_RADIUS = 2.f;
   float color_phase = 0.f;
 
@@ -49,7 +50,9 @@ int main() {
   // Attraction field configuration
   constexpr float FIELD_RADIUS = 500.f;
   constexpr float FIELD_FORCE = 10000.f;
-  int FIELD_BEHAVIOR = 1;
+  int field_sign = 1;
+
+  bool color_by_speed = false;
 
   while (window.isOpen()) {
     // Measure real elapsed time since last frame
@@ -84,23 +87,26 @@ int main() {
           stream_count = std::max(1, stream_count - 1);
         }
         if (event.key.code == sf::Keyboard::W) {
-          sf::Vector2f gravity{0.f, -1000.f};
+          sf::Vector2f gravity{0.f, -GRAVITY};
           solver.setGravity(gravity);
         }
         if (event.key.code == sf::Keyboard::A) {
-          sf::Vector2f gravity{-1000.f, 0.f};
+          sf::Vector2f gravity{-GRAVITY, 0.f};
           solver.setGravity(gravity);
         }
         if (event.key.code == sf::Keyboard::S) {
-          sf::Vector2f gravity{0.f, 1000.f};
+          sf::Vector2f gravity{0.f, GRAVITY};
           solver.setGravity(gravity);
         }
         if (event.key.code == sf::Keyboard::D) {
-          sf::Vector2f gravity{1000.f, 0.f};
+          sf::Vector2f gravity{GRAVITY, 0.f};
           solver.setGravity(gravity);
         }
         if (event.key.code == sf::Keyboard::I) {
-          FIELD_BEHAVIOR *= -1;
+          field_sign *= -1;
+        }
+        if (event.key.code == sf::Keyboard::C) {
+          color_by_speed = !color_by_speed;
         }
       }
 
@@ -159,7 +165,7 @@ int main() {
     bool right_held =
         window.hasFocus() && sf::Mouse::isButtonPressed(sf::Mouse::Right);
     solver.setForceField(right_held, world_pos, FIELD_RADIUS,
-                         FIELD_FORCE * float(FIELD_BEHAVIOR));
+                         FIELD_FORCE * float(field_sign));
 
     // Fixed-Timestep Accumulator with a max catch-up cap (prevents CPU
     // snowballing)
@@ -180,7 +186,7 @@ int main() {
 
     // Render visuals as fast (or slow) as the GPU/display runs
     window.clear(sf::Color(20, 22, 28));
-    renderer.render(window, solver.getParticles());
+    renderer.render(window, solver.getParticles(), color_by_speed, SUB_DT);
     hud.draw(window);
     window.display();
   }
