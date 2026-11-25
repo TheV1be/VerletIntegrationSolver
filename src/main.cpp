@@ -2,6 +2,8 @@
 #include "Renderer.hpp"
 #include "Solver.hpp"
 #include <SFML/Graphics.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <algorithm>
 #include <cmath>
 
@@ -79,6 +81,22 @@ int main() {
         }
         if (event.key.code == sf::Keyboard::N) {
           stream_count = std::max(1, stream_count - 1);
+        }
+        if (event.key.code == sf::Keyboard::W) {
+          sf::Vector2f gravity{0.f, -1000.f};
+          solver.setGravity(gravity);
+        }
+        if (event.key.code == sf::Keyboard::A) {
+          sf::Vector2f gravity{-1000.f, 0.f};
+          solver.setGravity(gravity);
+        }
+        if (event.key.code == sf::Keyboard::S) {
+          sf::Vector2f gravity{0.f, 1000.f};
+          solver.setGravity(gravity);
+        }
+        if (event.key.code == sf::Keyboard::D) {
+          sf::Vector2f gravity{1000.f, 0.f};
+          solver.setGravity(gravity);
         }
       }
 
