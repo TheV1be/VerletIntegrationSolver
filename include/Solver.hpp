@@ -1,4 +1,5 @@
 #pragma once
+#include "Constraint.hpp"
 #include "Particle.hpp"
 #include "SpatialGrid.hpp"
 #include <cstdint>
@@ -10,15 +11,29 @@ public:
 
   Particle &addParticle(sf::Vector2f pos, float radius = 8.f,
                         sf::Color color = sf::Color::Cyan);
-  void clear() { m_particles.clear(); }
+  Constraint &addConstraint(uint32_t idx1, uint32_t idx2, float length);
+  void addRope(sf::Vector2f start, int count, float spacing, float radius,
+               sf::Color color);
+  void addBridge(sf::Vector2f start, int count, float spacing, float radius,
+                 sf::Color color);
+  void addCloth(sf::Vector2f top_left, int w, int h, float spacing,
+                float radius, sf::Color color);
+  void clear() {
+    m_particles.clear();
+    m_constraints.clear();
+  }
   void update(float dt);
 
   void setForceField(bool active, sf::Vector2f pos = {0.f, 0.f},
                      float radius = 500.f, float strength = 10000.f);
 
   const std::vector<Particle> &getParticles() const { return m_particles; }
+  const std::vector<Constraint> &getConstraints() const {
+    return m_constraints;
+  }
   void setGravity(sf::Vector2f gravity) { m_gravity = gravity; }
   void setBounds(sf::Vector2f bounds);
+  bool isSpotFree(sf::Vector2f pos, float radius) const;
 
 private:
   void applyGravity();
@@ -27,8 +42,10 @@ private:
   void applyWindowBounds();
   void solveCollisions();
   void resolvePair(uint32_t idx1, uint32_t idx2);
+  void solveConstraints();
 
   std::vector<Particle> m_particles;
+  std::vector<Constraint> m_constraints;
   SpatialGrid m_grid;
   sf::Vector2f m_bounds;
   sf::Vector2f m_gravity{0.f, 1000.f};

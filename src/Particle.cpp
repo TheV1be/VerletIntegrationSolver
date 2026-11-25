@@ -5,6 +5,11 @@ Particle::Particle(sf::Vector2f pos, float r, sf::Color c)
       color(c) {}
 
 void Particle::update(float dt) {
+  if (pinned) {
+    acceleration = {0.f, 0.f};
+    old_pos = current_pos;
+    return;
+  }
   const sf::Vector2f displacement = current_pos - old_pos;
 
   const sf::Vector2f new_pos =

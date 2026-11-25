@@ -8,6 +8,7 @@ struct Particle {
   sf::Vector2f acceleration;
   float radius;
   sf::Color color;
+  bool pinned = false;
 
   Particle(sf::Vector2f pos, float radius = 12.f,
            sf::Color color = sf::Color::Cyan);

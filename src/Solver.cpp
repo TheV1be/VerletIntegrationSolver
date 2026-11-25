@@ -9,6 +9,53 @@ Particle &Solver::addParticle(sf::Vector2f pos, float radius, sf::Color color) {
   return m_particles.emplace_back(pos, radius, color);
 }
 
+Constraint &Solver::addConstraint(uint32_t idx1, uint32_t idx2, float length) {
+  return m_constraints.emplace_back(idx1, idx2, length);
+}
+
+void Solver::addRope(sf::Vector2f start, int count, float spacing, float radius,
+                     sf::Color color) {
+  const uint32_t first = static_cast<uint32_t>(m_particles.size());
+  for (int i = 0; i < count; ++i) {
+    Particle &p = addParticle({start.x + i * spacing, start.y}, radius, color);
+    if (i == 0)
+      p.pinned = true; // anchor the first particle
+    if (i > 0)
+      addConstraint(first + i - 1, first + i, spacing);
+  }
+}
+
+void Solver::addBridge(sf::Vector2f start, int count, float spacing,
+                       float radius, sf::Color color) {
+  const uint32_t first = static_cast<uint32_t>(m_particles.size());
+  for (int i = 0; i < count; ++i) {
+    Particle &p = addParticle({start.x + i * spacing, start.y}, radius, color);
+    if (i == 0 || i == count - 1)
+      p.pinned = true; // anchor the first and last particle
+    if (i > 0)
+      addConstraint(first + i - 1, first + i, spacing);
+  }
+}
+
+void Solver::addCloth(sf::Vector2f top_left, int w, int h, float spacing,
+                      float radius, sf::Color color) {
+  const uint32_t first = static_cast<uint32_t>(m_particles.size());
+  for (int y = 0; y < h; ++y) {
+    for (int x = 0; x < w; ++x) {
+      Particle &p = addParticle(
+          {top_left.x + x * spacing, top_left.y + y * spacing}, radius, color);
+      if (y == 0 && (x == 0 || x == w - 1))
+        p.pinned = true; // pin first and last particle of top row
+
+      const uint32_t idx = first + y * w + x;
+      if (x > 0)
+        addConstraint(idx - 1, idx, spacing); // link left
+      if (y > 0)
+        addConstraint(idx - w, idx, spacing); // link up
+    }
+  }
+}
+
 void Solver::setBounds(sf::Vector2f bounds) {
   m_bounds = bounds;
   m_grid.resize(bounds);
@@ -28,6 +75,10 @@ void Solver::update(float dt) {
     applyGravity();
     applyForceField();
     updatePositions(sub_dt);
+    constexpr int CONSTRAINT_ITERATIONS = 4;
+    for (int i = 0; i < CONSTRAINT_ITERATIONS; ++i) {
+      solveConstraints();
+    }
     solveCollisions();
     applyWindowBounds();
   }
@@ -94,6 +145,12 @@ void Solver::resolvePair(uint32_t idx1, uint32_t idx2) {
   Particle &p1 = m_particles[idx1];
   Particle &p2 = m_particles[idx2];
 
+  const float w1 = p1.pinned ? 0.f : 1.f;
+  const float w2 = p2.pinned ? 0.f : 1.f;
+  const float w_sum = w1 + w2;
+  if (w_sum == 0.f)
+    return;
+
   const sf::Vector2f axis = p1.current_pos - p2.current_pos;
   const float dist_sq = axis.x * axis.x + axis.y * axis.y;
   const float min_dist = p1.radius + p2.radius;
@@ -103,10 +160,10 @@ void Solver::resolvePair(uint32_t idx1, uint32_t idx2) {
     const float dist = std::sqrt(dist_sq);
     const sf::Vector2f normal = axis / dist;
     constexpr float RESPONSE = 0.75f;
-    const float overlap = 0.5f * RESPONSE * (min_dist - dist);
+    const float overlap = RESPONSE * (min_dist - dist);
 
-    p1.current_pos += normal * overlap;
-    p2.current_pos -= normal * overlap;
+    p1.current_pos += normal * (overlap * w1 / w_sum);
+    p2.current_pos -= normal * (overlap * w2 / w_sum);
   }
 }
 
@@ -148,4 +205,38 @@ void Solver::solveCollisions() {
       }
     }
   }
+}
+
+void Solver::solveConstraints() {
+  for (const auto &c : m_constraints) {
+    Particle &p1 = m_particles[c.idx1];
+    Particle &p2 = m_particles[c.idx2];
+
+    const float w1 = p1.pinned ? 0.f : 1.f;
+    const float w2 = p2.pinned ? 0.f : 1.f;
+    const float w_sum = w1 + w2;
+    if (w_sum == 0.f)
+      continue;
+
+    const sf::Vector2f axis = p1.current_pos - p2.current_pos;
+    const float dist = std::sqrt(axis.x * axis.x + axis.y * axis.y);
+    if (dist < 0.0001f)
+      continue;
+
+    // Positive when stretched, negative when squashed
+    const float diff = (dist - c.length) / dist;
+    p1.current_pos -= axis * (diff * w1 / w_sum);
+    p2.current_pos += axis * (diff * w2 / w_sum);
+  }
+}
+
+bool Solver::isSpotFree(sf::Vector2f pos, float radius) const {
+  for (const auto &p : m_particles) {
+    const sf::Vector2f d = p.current_pos - pos;
+    const float min_dist = p.radius + radius;
+    if (d.x * d.x + d.y * d.y < min_dist * min_dist) {
+      return false;
+    }
+  }
+  return true;
 }

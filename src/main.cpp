@@ -108,6 +108,24 @@ int main() {
         if (event.key.code == sf::Keyboard::C) {
           color_by_speed = !color_by_speed;
         }
+        if (event.key.code == sf::Keyboard::Num1) {
+          const sf::Vector2f mouse =
+              window.mapPixelToCoords(sf::Mouse::getPosition(window));
+          solver.addRope(mouse, 25, BALL_RADIUS * 2.f, BALL_RADIUS,
+                         sf::Color::White);
+        }
+        if (event.key.code == sf::Keyboard::Num2) {
+          const sf::Vector2f mouse =
+              window.mapPixelToCoords(sf::Mouse::getPosition(window));
+          solver.addBridge(mouse, 25, BALL_RADIUS * 2.f, BALL_RADIUS,
+                           sf::Color::White);
+        }
+        if (event.key.code == sf::Keyboard::Num3) {
+          const sf::Vector2f mouse =
+              window.mapPixelToCoords(sf::Mouse::getPosition(window));
+          solver.addCloth(mouse, 10, 10, BALL_RADIUS * 2.f + 4.f, BALL_RADIUS,
+                          sf::Color::White);
+        }
       }
 
       if (event.type == sf::Event::Resized) {
@@ -151,7 +169,8 @@ int main() {
       if (world_pos.x >= 0.f &&
           world_pos.x <= static_cast<float>(window.getSize().x) &&
           world_pos.y >= 0.f &&
-          world_pos.y <= static_cast<float>(window.getSize().y)) {
+          world_pos.y <= static_cast<float>(window.getSize().y) &&
+          solver.isSpotFree(world_pos, BALL_RADIUS)) {
 
         sf::Color stream_color(
             static_cast<sf::Uint8>(128 + 127 * std::sin(color_phase)),
