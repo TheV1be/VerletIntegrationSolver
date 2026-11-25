@@ -22,7 +22,7 @@ public:
     m_particles.clear();
     m_constraints.clear();
   }
-  void update(float dt);
+  void update(float dt, bool circular_bounds);
 
   void setForceField(bool active, sf::Vector2f pos = {0.f, 0.f},
                      float radius = 500.f, float strength = 10000.f);

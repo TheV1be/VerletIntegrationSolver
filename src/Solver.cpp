@@ -70,7 +70,7 @@ void Solver::setForceField(bool active, sf::Vector2f pos, float radius,
   m_field_strength = strength;
 }
 
-void Solver::update(float dt) {
+void Solver::update(float dt, bool circular_bounds) {
   const float sub_dt = dt / static_cast<float>(m_sub_steps);
   for (uint32_t step = 0; step < m_sub_steps; ++step) {
     applyGravity();
@@ -81,7 +81,7 @@ void Solver::update(float dt) {
       solveConstraints();
     }
     solveCollisions();
-    applyCircularWindowBounds();
+    (circular_bounds ? applyCircularWindowBounds() : applyWindowBounds());
   }
 }
 

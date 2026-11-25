@@ -53,6 +53,7 @@ int main() {
   int field_sign = 1;
 
   bool color_by_speed = false;
+  bool circular_bounds = false;
 
   while (window.isOpen()) {
     // Measure real elapsed time since last frame
@@ -107,6 +108,9 @@ int main() {
         }
         if (event.key.code == sf::Keyboard::C) {
           color_by_speed = !color_by_speed;
+        }
+        if (event.key.code == sf::Keyboard::B) {
+          circular_bounds = !circular_bounds;
         }
         if (event.key.code == sf::Keyboard::Num1) {
           const sf::Vector2f mouse =
@@ -191,7 +195,7 @@ int main() {
     constexpr int MAX_STEPS_PER_FRAME = 2;
     int steps = 0;
     while (time_accumulator >= FIXED_DT && steps < MAX_STEPS_PER_FRAME) {
-      solver.update(FIXED_DT);
+      solver.update(FIXED_DT, circular_bounds);
       time_accumulator -= FIXED_DT;
       steps++;
     }
