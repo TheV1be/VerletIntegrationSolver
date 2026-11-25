@@ -49,6 +49,7 @@ int main() {
   // Attraction field configuration
   constexpr float FIELD_RADIUS = 500.f;
   constexpr float FIELD_FORCE = 10000.f;
+  int FIELD_BEHAVIOR = 1;
 
   while (window.isOpen()) {
     // Measure real elapsed time since last frame
@@ -97,6 +98,9 @@ int main() {
         if (event.key.code == sf::Keyboard::D) {
           sf::Vector2f gravity{1000.f, 0.f};
           solver.setGravity(gravity);
+        }
+        if (event.key.code == sf::Keyboard::I) {
+          FIELD_BEHAVIOR *= -1;
         }
       }
 
@@ -154,7 +158,8 @@ int main() {
     // Right-click: invisible attraction force field
     bool right_held =
         window.hasFocus() && sf::Mouse::isButtonPressed(sf::Mouse::Right);
-    solver.setForceField(right_held, world_pos, FIELD_RADIUS, FIELD_FORCE);
+    solver.setForceField(right_held, world_pos, FIELD_RADIUS,
+                         FIELD_FORCE * float(FIELD_BEHAVIOR));
 
     // Fixed-Timestep Accumulator with a max catch-up cap (prevents CPU
     // snowballing)
